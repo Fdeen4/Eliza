@@ -1,5 +1,8 @@
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 import java.util.Random;
+import java.util.HashMap;
 public class Eliza {
 
     public static void main(String[] args) {
@@ -18,36 +21,48 @@ public class Eliza {
     private static String respond(String prompt) {
         String response = prompt;
         Random rnd = new Random();
-        int responseType = rnd.nextInt(3);
+        int responseType = 1 + rnd.nextInt(2);
         if (responseType == 1) {
             response = replacePronouns(response);
             response = addQualifier(response, rnd);
         }
-        else {
+        else if(responseType == 2){
             response = hedge(rnd);
         }
-        return response;
+        if (prompt.contains ("caps")) return response.replaceAll ("caps", "").toUpperCase();
+        else if (prompt.contains ("lower case")) return response.replaceAll ("lower case", "").toLowerCase();
+        else return response;
     }
 
     private static String hedge(Random rnd) {
         String response;
-        String [] hedges = {"Please tell me more", "Many of my patients tell me the same thing", "It is getting late, maybe we had better quit"};
-        response = hedges [rnd.nextInt(hedges.length)];
+        String [] hedgesA = {"Please tell me more",
+                "Many of my patients tell me the same thing",
+                "It is getting late, maybe we had better quit"};
+        ArrayList<String> hedges = new ArrayList<String>(Arrays.asList(hedgesA));
+        response = hedges.get (rnd.nextInt(hedges.size()));
         return response;
     }
 
     private static String addQualifier(String response, Random rnd) {
-        String [] qualifiers = {"Why do you say that", "You seem to think that", "So, you are concerned that"};
-        response =  qualifiers [rnd.nextInt(qualifiers.length)]+ " " + response + "?";
+        String [] qualifiersA = {"Why do you say that", "You seem to think that", "So, you are concerned that"};
+        ArrayList<String> qualifiers = new ArrayList<String>(Arrays.asList(qualifiersA));
+        response =  qualifiers.get(rnd.nextInt(qualifiers.size()))+ " " + response + "?";
         return response;
     }
 
     private static String replacePronouns(String response) {
-        String [] responses = {"me", "my", "I", "am"};
-        String [] replacements = {"you", "your", "you", "are"};
-        for (int i = 0; i < responses.length; i++) {
-            if (response.contains (" " + responses[i] )|| response.contains(responses[i] + " ") || response.equals(responses[i])) {
-                response = response.replaceAll(responses[i], replacements[i]);
+        String [] responsesA = {"me", "my", "I", "am"};
+        ArrayList<String> responses = new ArrayList<String>(Arrays.asList(responsesA));
+        HashMap<String, String> replacementResponses = new HashMap();
+        String [] replacementsA = {"you", "your", "you", "are"};
+        ArrayList<String> replacements = new ArrayList<String>(Arrays.asList( replacementsA));
+        for (int i = 0; i < responsesA.length; i++){
+            replacementResponses.put(responsesA[i],replacementsA[i]);
+        }
+        for (int i = 0; i < replacementResponses.size(); i++) {
+            if (response.contains (" " + responses.get (i) )|| response.contains(responses.get(i) + " ") || response.equals(responses.get (i))) {
+                response = response.replaceAll(responsesA[i], replacementResponses.get(responsesA[i]));
             }
         }
         return response;
